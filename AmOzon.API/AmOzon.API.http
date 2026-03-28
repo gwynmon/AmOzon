@@ -1,0 +1,6 @@
+@AmOzon.API_HostAddress = http://localhost:5013
+
+GET {{AmOzon.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
