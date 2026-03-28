@@ -9,9 +9,12 @@ public class ProductConfiguration : IEntityTypeConfiguration<ProductEntity>
 {
     public void Configure(EntityTypeBuilder<ProductEntity> builder)
     {
-        builder.HasKey(x => x.ProductId);
+        builder.HasKey(p => p.Id);
+
+        builder.HasOne(p => p.Seller)
+            .WithMany(s => s.Products);
         
-        builder.Property(x => x.Name).IsRequired()
+        builder.Property(p => p.Name)
             .HasMaxLength(Product.MAX_NAME_LENGTH)
             .IsRequired();
         

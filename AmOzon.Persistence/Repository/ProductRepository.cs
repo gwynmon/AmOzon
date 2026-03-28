@@ -21,7 +21,7 @@ public class ProductRepository : IProductRepository
             .ToListAsync();
 
         var products = productEntities
-            .Select(p => Product.Create(p.ProductId, p.Name, p.Description, p.Price, p.Amount, p.SellerId).Product)
+            .Select(p => Product.Create(p.Id, p.Name, p.Description, p.Price, p.Amount, p.SellerId).Product)
             .ToList();
 
         return products;
@@ -31,7 +31,7 @@ public class ProductRepository : IProductRepository
     {
         var productEntity = new ProductEntity
         {
-            ProductId = product.ProductId,
+            Id = product.Id,
             Name = product.Name,
             Description = product.Description,
             Price = product.Price,
@@ -42,28 +42,28 @@ public class ProductRepository : IProductRepository
         await _context.Products.AddAsync(productEntity);
         await _context.SaveChangesAsync();
         
-        return productEntity.ProductId;
+        return productEntity.Id;
     }
 
-    public async Task<Guid> Update(Product product)
+    public async Task<Guid> Update(Guid id, string name, string description, decimal price, int amount, Guid sellerId)
     {
         await _context.Products
-            .Where(p => p.ProductId == product.ProductId)
+            .Where(p => p.Id == id)
             .ExecuteUpdateAsync<ProductEntity>(s => s
-                .SetProperty(p => p.Name, p => product.Name)
-                .SetProperty(p => p.Description, p => product.Description)
-                .SetProperty(p => p.Price, p => product.Price)
-                .SetProperty(p => p.Amount, p => product.Amount)
-                .SetProperty(p => p.SellerId, p => product.SellerId));
+                .SetProperty(p => p.Name, p => name)
+                .SetProperty(p => p.Description, p => description)
+                .SetProperty(p => p.Price, p => price)
+                .SetProperty(p => p.Amount, p => amount)
+                .SetProperty(p => p.SellerId, p => sellerId));
         
         await _context.SaveChangesAsync();
-        return product.ProductId;
+        return id;
     }
 
     public async Task<Guid> Delete(Guid id)
     {
         await _context.Products
-            .Where(p => p.ProductId == id)
+            .Where(p => p.Id == id)
             .ExecuteDeleteAsync();
         
         await _context.SaveChangesAsync();

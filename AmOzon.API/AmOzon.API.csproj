@@ -24,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\AmOzon.Application\AmOzon.Application.csproj" />
       <ProjectReference Include="..\AmOzon.Persistence\AmOzon.Persistence.csproj" />
     </ItemGroup>
 

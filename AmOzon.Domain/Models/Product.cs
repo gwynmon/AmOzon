@@ -5,7 +5,7 @@ public class Product
     public const int MAX_NAME_LENGTH = 128;
     public Product(Guid id, string name, string description, decimal price, int amount, Guid sellerId)
     {
-        ProductId = id;
+        Id = id;
         Name = name;
         Description = description;
         CreatedAt = DateTime.UtcNow;
@@ -14,7 +14,7 @@ public class Product
         SellerId = sellerId;
     }
     
-    public Guid ProductId { get; }
+    public Guid Id { get; }
     public string Name { get; } = string.Empty;
     public string Description { get; } = string.Empty;
     public DateTime CreatedAt {get; }
@@ -38,8 +38,4 @@ public class Product
         
         return (product, error);
     }
-}
-
-public class Seller
-{
 }
