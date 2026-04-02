@@ -5,24 +5,73 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AmOzon.Persistence.Repository;
 
-public class ProductRepository : IProductRepository
+public class ProductRepository(AmOzonDbContext dbContext) : IProductRepository
 {
-    private readonly AmOzonDbContext _context;
-    
-    public ProductRepository(AmOzonDbContext dbContext)
-    {
-        _context = dbContext;
-    }
-    
     public async Task<List<Product>> GetAll()
     {
-        var productEntities = await _context.Products
+        var productEntities = await dbContext.Products
             .AsNoTracking()
             .ToListAsync();
 
         var products = productEntities
-            .Select(p => Product.Create(p.Id, p.Name, p.Description, p.Price, p.Amount, p.SellerId).Product)
+            .Select(p => Product.Create(
+                p.Id, 
+                p.Name, 
+                p.Description, 
+                p.CreatedAt, 
+                p.Price, 
+                p.StockQuantity, 
+                p.SellerId, 
+                p.IsDeleted
+                ))
             .ToList();
+        Console.WriteLine(productEntities.Count);
+        Console.WriteLine(products.Count);
+        return products;
+    }
+
+    public async Task<Product?> GetById(Guid id)
+    {
+        var productEntity = await dbContext.Products
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (productEntity == null)
+        {
+            return null;
+        }
+
+        var product = Product.Create(
+            productEntity.Id,
+            productEntity.Name,
+            productEntity.Description,
+            productEntity.CreatedAt,
+            productEntity.Price,
+            productEntity.StockQuantity,
+            productEntity.SellerId,
+            productEntity.IsDeleted
+            );
+
+        return product;
+    }
+
+    public async Task<List<Product>> GetBySellerId(Guid id)
+    {
+        var  productEntities = await dbContext.Products
+            .AsNoTracking()
+            .ToListAsync();
+
+        var products = productEntities
+            .Select(p => Product.Create(
+                    p.Id,
+                    p.Name,
+                    p.Description,
+                    p.CreatedAt,
+                    p.Price,
+                    p.StockQuantity,
+                    p.SellerId,
+                    p.IsDeleted
+                ))
+                .ToList();
 
         return products;
     }
@@ -34,39 +83,70 @@ public class ProductRepository : IProductRepository
             Id = product.Id,
             Name = product.Name,
             Description = product.Description,
+            CreatedAt = product.CreatedAt,
             Price = product.Price,
-            Amount = product.Amount,
-            SellerId = product.SellerId
+            StockQuantity = product.StockQuantity,
+            SellerId = product.SellerId,
+            IsDeleted = product.IsDeleted
         };
         
-        await _context.Products.AddAsync(productEntity);
-        await _context.SaveChangesAsync();
+        await dbContext.Products.AddAsync(productEntity);
+        await dbContext.SaveChangesAsync();
         
         return productEntity.Id;
     }
 
-    public async Task<Guid> Update(Guid id, string name, string description, decimal price, int amount, Guid sellerId)
+    public async Task<Guid> Update(Product product)
     {
-        await _context.Products
-            .Where(p => p.Id == id)
-            .ExecuteUpdateAsync<ProductEntity>(s => s
-                .SetProperty(p => p.Name, p => name)
-                .SetProperty(p => p.Description, p => description)
-                .SetProperty(p => p.Price, p => price)
-                .SetProperty(p => p.Amount, p => amount)
-                .SetProperty(p => p.SellerId, p => sellerId));
+        await dbContext.Products
+            .Where(p => p.Id == product.Id)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(p => p.Name, product.Name)
+                .SetProperty(p => p.Description, product.Description)
+                .SetProperty(p => p.Price, product.Price)
+                .SetProperty(p => p.StockQuantity, product.StockQuantity));
         
-        await _context.SaveChangesAsync();
-        return id;
+        await dbContext.SaveChangesAsync();
+        return product.Id;
     }
 
     public async Task<Guid> Delete(Guid id)
     {
-        await _context.Products
+        await dbContext.Products
             .Where(p => p.Id == id)
             .ExecuteDeleteAsync();
         
-        await _context.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
+        return id;
+    }
+
+    public async Task<Guid?> MarkDeleted(Guid id)
+    {
+        var product = await dbContext.Products
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (product == null)
+        {
+            return null;
+        }
+        
+        product.IsDeleted = true;
+        await dbContext.SaveChangesAsync();
+        return id;
+    }
+
+    public async Task<Guid?> RevokeDeleted(Guid id)
+    {
+        var product = await dbContext.Products
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (product == null)
+        {
+            return null;
+        }
+        
+        product.IsDeleted = false;
+        await dbContext.SaveChangesAsync();
         return id;
     }
 }

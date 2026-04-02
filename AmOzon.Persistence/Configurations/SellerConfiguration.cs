@@ -8,12 +8,12 @@ public class SellerConfiguration : IEntityTypeConfiguration<SellerEntity>
 {
     public void Configure(EntityTypeBuilder<SellerEntity> builder)
     {
-        builder.HasKey(p => p.Id);
-
         builder
-            .HasMany(p => p.Products)
-            .WithOne(p => p.Seller);
+            .HasKey(s => s.Id);
         
-        // More checks!
+        builder
+            .HasOne(s => s.User)
+            .WithOne(u => u.Seller)
+            .HasForeignKey<SellerEntity>(s => s.UserId);
     }
 }

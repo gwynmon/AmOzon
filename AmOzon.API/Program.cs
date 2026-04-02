@@ -1,3 +1,4 @@
+using AmOzon.Application.Abstractions;
 using AmOzon.Application.Services;
 using AmOzon.Domain.Abstractions;
 using AmOzon.Persistence;
@@ -17,6 +18,12 @@ builder.Services.AddDbContext<AmOzonDbContext>(options =>
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ISellerRepository, SellerRepository>();
+builder.Services.AddScoped<ISellerService, SellerService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 var app = builder.Build();
 

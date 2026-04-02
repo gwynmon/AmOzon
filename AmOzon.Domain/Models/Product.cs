@@ -1,41 +1,64 @@
+using System.ComponentModel.DataAnnotations;
+using AmOzon.Domain.Constants;
+
 namespace AmOzon.Domain.Models;
 
 public class Product
 {
-    public const int MAX_NAME_LENGTH = 128;
-    public Product(Guid id, string name, string description, decimal price, int amount, Guid sellerId)
+    private Product(Guid id, string name, string description, 
+        DateTime createdAt, decimal price, int stockQuantity, 
+        Guid sellerId, bool isDeleted)
     {
         Id = id;
         Name = name;
         Description = description;
-        CreatedAt = DateTime.UtcNow;
+        CreatedAt = createdAt;
         Price = price;
-        Amount = amount;
+        StockQuantity = stockQuantity;
         SellerId = sellerId;
+        IsDeleted = isDeleted;
     }
     
     public Guid Id { get; }
-    public string Name { get; } = string.Empty;
-    public string Description { get; } = string.Empty;
+    public string? Name { get; private set; }
+    public string Description { get; private set; }
     public DateTime CreatedAt {get; }
-    public decimal Price { get; }
-    public int Amount { get; }
+    public decimal Price { get; private set; }
+    public int StockQuantity { get; private set; }
     public Guid SellerId { get;}
-    public Seller? Seller { get;}
+    public bool IsDeleted { get; private set; }
 
-    public static (Product Product, string Error) Create(Guid id, string name, string description, decimal price,
-        int amount, Guid sellerId)
+    public static Product Create(
+        Guid id, string name, string description, DateTime createdAt,
+        decimal price, int stockQuantity, Guid sellerId, bool isDeleted)
     {
-        var error = string.Empty;
-
-        if (string.IsNullOrWhiteSpace(name) || name.Length > MAX_NAME_LENGTH)
+        if (stockQuantity > 1000)
         {
-            error = "Invalid product name";
+            throw new ValidationException("Stock quantity must be less than 1000");
         }
-        // Add More Validation
         
-        var product = new Product(id, name, description, price, amount, sellerId);
+        if (price > 1000)
+        {
+            throw new ValidationException("Price must be less than 1000");
+        }
         
-        return (product, error);
+        var product = new Product(id, name, description, createdAt, 
+            price, stockQuantity, sellerId, isDeleted);
+        
+        return product;
+    }
+    
+    public void Update(string newName, string newDescription, 
+        decimal newPrice, int newStockQuantity)
+    {
+        if (IsDeleted)
+        {
+            throw new ValidationException("Product cannot be changed if it's marked as deleted");
+        }
+        
+        Name = newName;
+        Description = newDescription;
+        Price = newPrice;
+        StockQuantity = newStockQuantity;
     }
 }

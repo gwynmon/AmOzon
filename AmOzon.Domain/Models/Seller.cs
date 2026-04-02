@@ -1,20 +1,31 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace AmOzon.Domain.Models;
 
 public class Seller
 {
-    public Seller(Guid id)
+    private Seller(Guid id, Guid userId)
     {
         Id = id;
+        UserId = userId;
     }
     
     public Guid Id { get; }
-
-    public static (Seller seller, string error) Create(Guid id)
+    public Guid UserId { get; } 
+    public static Seller Create(Guid id, Guid userId)
     {
-        string error = string.Empty;
+        if (id == Guid.Empty)
+        {
+            throw new ValidationException("Invalid seller Guid.");
+        }
         
-        var seller = new Seller(id);
+        if (userId == Guid.Empty)
+        {
+            throw new ValidationException("Invalid user Guid.");
+        }
+
+        var seller = new Seller(id, userId);
         
-        return (seller, error);
+        return seller;
     }
 }

@@ -1,66 +1,68 @@
-using AmOzon.API.Contracts;
-using AmOzon.Application.Services;
-using AmOzon.Domain.Models;
+using AmOzon.Application.Abstractions;
+using AmOzon.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Mapster;
 
 namespace AmOzon.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController : ControllerBase
+public class ProductsController(IProductService productService) : ControllerBase
 {
-    private readonly IProductService _productService;
-    
-    public ProductsController(IProductService productService)
+    [HttpPost("create")]
+    public async Task<ActionResult<Guid>> CreateProduct([FromBody] ProductsCreateRequest request)
     {
-        _productService = productService;
+        var productId = await productService.CreateProductAsync(request);
+        return CreatedAtAction(nameof(CreateProduct), new { id = productId }, productId); 
+    }
+    
+    [HttpGet("get-all")]
+    public async Task<ActionResult<List<ProductsResponse>>> GetAllProducts()
+    {
+        var products = await productService.GetAllProducts();
+        var response = products.Adapt<List<ProductsResponse>>();
+        return Ok(response);
+    }
+    
+    [HttpGet("get/{id:guid}")]
+    public async Task<ActionResult<ProductsResponse>> GetProductById(Guid id)
+    {
+        var product = await productService.GetProduct(id);
+        return Ok(product);
     }
 
-    [HttpGet]
-    public async Task<ActionResult<List<Product>>> GetAllProducts()
+    [HttpGet("get-by-seller/{id:guid}")]
+    public async Task<ActionResult<List<ProductsResponse>>> GetProductsBySeller(Guid id)
     {
-        var products = await _productService.GetAllProducts();
-
-        var response = products.Select(p =>
-            new ProductsResponse(p.Id, p.Name, p.Description, p.CreatedAt, p.Price, p.Amount,
-                p.SellerId));
-        
+        var products = await productService.GetProductsBySeller(id);
+        var response = products.Adapt<List<ProductsResponse>>();
         return Ok(response);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<Guid>> CreateProduct([FromBody] ProductsRequest request)
+    [HttpPut("update/{id:guid}")]
+    public async Task<ActionResult<Guid>> UpdateProduct(Guid id, [FromBody] ProductsUpdateRequest request)
     {
-        var (product, error) = Product.Create(
-            Guid.NewGuid(),
-            request.Name,
-            request.Description,
-            request.Price,
-            request.Amount,
-            request.SellerId
-        );
-
-        if (!string.IsNullOrEmpty(error))
-        {
-            return BadRequest(error);
-        }
-        
-        var productId = await _productService.CreateProduct(product);
-        
+        var productId = await productService.UpdateProduct(id, request);
         return Ok(productId);
     }
 
-    [HttpPut("{id:guid}")]
-    public async Task<ActionResult<Guid>> UpdateProduct(Guid id, [FromBody] ProductsRequest request)
+    [HttpPut("mark-deleted/{id:guid}")]
+    public async Task<ActionResult<Guid>> MarkDeleted(Guid id)
     {
-        var productId = await _productService.UpdateProduct(id, request.Name, request.Description, request.Price, request.Amount, request.SellerId);
-        
+        var productId = await productService.MarkDeleted(id);
+        return Ok(productId);
+    }
+
+    [HttpPut("revoke-deleted/{id:guid}")]
+    public async Task<ActionResult<Guid>> RevokeDeleted(Guid id)
+    {
+        var productId = await productService.RevokeDeleted(id);
         return Ok(productId);
     }
     
-    [HttpDelete("{id:guid}")]
+    [HttpDelete("delete/{id:guid}")]
     public async Task<IActionResult> DeleteProduct(Guid id)
     {
-        return Ok(await _productService.DeleteProduct(id));
+        return Ok(await productService.DeleteProduct(id));
     }
 }
