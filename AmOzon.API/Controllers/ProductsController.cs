@@ -1,7 +1,9 @@
 using AmOzon.Application.Abstractions;
-using AmOzon.Contracts;
+using AmOzon.Contracts.Requests;
+using AmOzon.Contracts.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Mapster;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AmOzon.API.Controllers;
 
@@ -10,10 +12,11 @@ namespace AmOzon.API.Controllers;
 public class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpPost("create")]
+    [Authorize(Roles = "Seller")]
     public async Task<ActionResult<Guid>> CreateProduct([FromBody] ProductsCreateRequest request)
     {
         var productId = await productService.CreateProductAsync(request);
-        return CreatedAtAction(nameof(CreateProduct), new { id = productId }, productId); 
+        return CreatedAtAction(nameof(GetProductById), new { id = productId }, productId); 
     }
     
     [HttpGet("get-all")]
@@ -28,7 +31,8 @@ public class ProductsController(IProductService productService) : ControllerBase
     public async Task<ActionResult<ProductsResponse>> GetProductById(Guid id)
     {
         var product = await productService.GetProduct(id);
-        return Ok(product);
+        var response = product.Adapt<ProductsResponse>();
+        return Ok(response);
     }
 
     [HttpGet("get-by-seller/{id:guid}")]
@@ -40,6 +44,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpPut("update/{id:guid}")]
+    [Authorize(Roles = "Seller")]
     public async Task<ActionResult<Guid>> UpdateProduct(Guid id, [FromBody] ProductsUpdateRequest request)
     {
         var productId = await productService.UpdateProduct(id, request);
@@ -47,6 +52,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpPut("mark-deleted/{id:guid}")]
+    [Authorize(Roles = "Seller")]
     public async Task<ActionResult<Guid>> MarkDeleted(Guid id)
     {
         var productId = await productService.MarkDeleted(id);
@@ -54,6 +60,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpPut("revoke-deleted/{id:guid}")]
+    [Authorize(Roles = "Seller")]
     public async Task<ActionResult<Guid>> RevokeDeleted(Guid id)
     {
         var productId = await productService.RevokeDeleted(id);
@@ -61,6 +68,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
     
     [HttpDelete("delete/{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteProduct(Guid id)
     {
         return Ok(await productService.DeleteProduct(id));

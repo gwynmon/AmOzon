@@ -1,23 +1,27 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER $APP_UID
+﻿FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY ["AmOzon.API/AmOzon.API.csproj", "AmOzon.API/"]
+COPY ["AmOzon.Application/AmOzon.Application.csproj", "AmOzon.Application/"]
+COPY ["AmOzon.Domain/AmOzon.Domain.csproj", "AmOzon.Domain/"]
+COPY ["AmOzon.Persistence/AmOzon.Persistence.csproj", "AmOzon.Persistence/"]
+COPY ["AmOzon.Contracts/AmOzon.Contracts.csproj", "AmOzon.Contracts/"]
+
+RUN dotnet restore "AmOzon.API/AmOzon.API.csproj"
+
+COPY . .
+
+WORKDIR "/src/AmOzon.API"
+RUN dotnet build "AmOzon.API.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "AmOzon.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["AmOzon.API/AmOzon.API.csproj", "AmOzon.API/"]
-RUN dotnet restore "AmOzon.API/AmOzon.API.csproj"
-COPY . .
-WORKDIR "/src/AmOzon.API"
-RUN dotnet build "./AmOzon.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./AmOzon.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
-WORKDIR /app
 COPY --from=publish /app/publish .
+
 ENTRYPOINT ["dotnet", "AmOzon.API.dll"]

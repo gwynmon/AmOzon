@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\AmOzon.Contracts\AmOzon.Contracts.csproj" />
+    </ItemGroup>
+
 </Project>

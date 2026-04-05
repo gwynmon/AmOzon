@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using AmOzon.Application.Abstractions;
-using AmOzon.Contracts;
 using AmOzon.Application.Commands;
+using AmOzon.Contracts.Requests;
 using AmOzon.Domain.Abstractions;
 using AmOzon.Domain.Models;
 using Mapster;
@@ -15,9 +15,16 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         return await productRepository.GetAll();
     }
 
-    public async Task<Product?> GetProduct(Guid id)
+    public async Task<Product> GetProduct(Guid id)
     {
-        return await productRepository.GetById(id);
+        var product = await productRepository.GetById(id);
+
+        if (product == null)
+        {
+            throw new ApplicationException($"Product with id {id} does not exists");
+        }
+        
+        return product;
     }
 
     public async Task<List<Product>> GetProductsBySeller(Guid id)

@@ -14,12 +14,8 @@
 
     <ItemGroup>
       <PackageReference Include="Mapster" Version="10.0.6" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Microsoft.AspNetCore.Mvc.Core">
-        <HintPath>..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.AspNetCore.App\10.0.2\Microsoft.AspNetCore.Mvc.Core.dll</HintPath>
-      </Reference>
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.17.0" />
     </ItemGroup>
 
 </Project>

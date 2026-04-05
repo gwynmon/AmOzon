@@ -1,35 +1,47 @@
+using AmOzon.API.Extensions;
 using AmOzon.Application.Abstractions;
-using AmOzon.Application.Commands;
-using AmOzon.Contracts;
+using AmOzon.Contracts.Responses;
 using AmOzon.Domain.Models;
 using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AmOzon.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SellerController(ISellerService sellerService) : ControllerBase
+public class SellerController(ISellerService sellerService, IAuthService authService) : ControllerBase
 {
     [HttpPost("create")]
-    public async Task<ActionResult<Guid>> CreateProduct([FromBody] SellerRequest request)
+    [Authorize]
+    public async Task<ActionResult> CreateSeller()
     {
-        var command = request.Adapt<CreateSellerCommand>();
-        var sellerId = await sellerService.CreateSellerAsync(command);
-        return CreatedAtAction(nameof(CreateProduct), new { id = sellerId }, sellerId); 
+        var userId = User.GetUserId();
+        
+        var sellerId = await sellerService.CreateSellerAsync(userId);
+        var newToken = await authService.RefreshRoleTokenAsync(userId);
+        
+        return Ok(new
+        {
+            message = "Seller created and token updated.",
+            sellerId,
+            newToken
+        }); 
     }
 
     [HttpGet("get-all")]
-    public async Task<ActionResult<List<Seller>>> GetAllSellers()
+    public async Task<ActionResult<List<SellerResponse>>> GetAllSellers()
     {
         var sellers = await sellerService.GetAllSellers();
-        return sellers;
+        var response = sellers.Adapt<List<SellerResponse>>(); 
+        return Ok(response);
     }
 
     [HttpGet("get/{id:guid}")]
-    public async Task<ActionResult<Seller>> GetSeller(Guid id)
+    public async Task<ActionResult<SellerResponse>> GetSeller(Guid id)
     {
         var seller = await sellerService.GetSeller(id);
-        return seller;
+        var response = seller.Adapt<SellerResponse>(); 
+        return Ok(response);
     }
 }

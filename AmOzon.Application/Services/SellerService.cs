@@ -7,11 +7,11 @@ namespace AmOzon.Application.Services;
 
 public class SellerService(ISellerRepository sellerRepository) : ISellerService
 {
-    public async Task<Guid> CreateSellerAsync(CreateSellerCommand command)
+    public async Task<Guid> CreateSellerAsync(Guid userId)
     {
         var seller = Seller.Create(
             Guid.NewGuid(),
-            command.UserId
+            userId
         );
 
         var sellerId = await sellerRepository.Create(seller);

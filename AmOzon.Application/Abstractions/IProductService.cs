@@ -1,5 +1,4 @@
-using AmOzon.Application.Commands;
-using AmOzon.Contracts;
+using AmOzon.Contracts.Requests;
 using AmOzon.Domain.Models;
 
 namespace AmOzon.Application.Abstractions;

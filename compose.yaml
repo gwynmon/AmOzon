@@ -1,15 +1,50 @@
 ﻿services:
-  postgres:
-    container_name: postgres
-    image: postgres:latest
+  db:
+    image: postgres:16-alpine
+    container_name: amozon-db
     environment:
-      POSTGRES_DB: "db"
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "123"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password_123
+      POSTGRES_DB: AmOzonDb
     ports:
       - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - amozon-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: AmOzon.API/Dockerfile
+    container_name: amozon-api
+    environment:
+      ConnectionStrings__AmOzonDbContext: "Host=db;Port=5432;Database=AmOzonDb;Username=postgres;Password=postgres_password_123"
+      
+      JwtSettings__SecretKey: "SuperSecretKey_That_Is_Long_Enough_For_HS256_Algorithm_12345!"
+      JwtSettings__Issuer: "AmOzonAPI"
+      JwtSettings__Audience: "AmOzonClient"
+      JwtSettings__ExpirationInMinutes: "60"
+      
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - amozon-network
+    restart: unless-stopped
 
 volumes:
-  postgres-data:
+  pgdata:
+
+networks:
+  amozon-network:
+    driver: bridge

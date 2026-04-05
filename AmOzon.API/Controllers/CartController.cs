@@ -1,6 +1,7 @@
+using AmOzon.API.Extensions;
 using AmOzon.Application.Abstractions;
-using AmOzon.Contracts;
-using AmOzon.Domain.Models;
+using AmOzon.Contracts.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AmOzon.API.Controllers;
@@ -8,35 +9,43 @@ namespace AmOzon.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CartController(ICartService cartService) : ControllerBase
 {
     [HttpPost("add-item")]
-    public async Task<ActionResult<Guid>> AddProductToUsersCart(AddProductToUsersCartRequest request)
+    public async Task<ActionResult<Guid>> AddProductToUsersCart(Guid productId, int cartQuantity)
     {
-        return await cartService.AddProductToUsersCart(request);
+        var userId = User.GetUserId();
+        return await cartService.AddProductToUsersCart(userId, productId, cartQuantity);
     }
 
     [HttpGet("get-items")]
-    public async Task<ActionResult<List<CartItem>>> GetUsersCartItems(Guid userId)
+    public async Task<ActionResult<List<CartItemResponse>>> GetUsersCartItems()
     {
-        return await cartService.GetUsersCartItems(userId);
+        var userId = User.GetUserId();
+        var cart = await cartService.GetUsersCartItems(userId);
+        return Ok(cart);
     }
 
     [HttpPut("update-quantity/{itemId:guid}/{quantity:int}")]
     public async Task<ActionResult<Guid>> UpdateQuantity(Guid itemId, int quantity)
     {
-        return await cartService.UpdateQuantity(itemId, quantity);
+        var userId = User.GetUserId();
+        return await cartService.UpdateQuantity(userId, itemId, quantity);
     }
 
     [HttpDelete("delete-item/{itemId:guid}")]
     public async Task<ActionResult<Guid>> DeleteItem(Guid itemId)
     {
-        return await cartService.DeleteItem(itemId);
+        var userId = User.GetUserId();
+        return await cartService.DeleteItem(userId, itemId);
     }
     
-    [HttpDelete("clear/{userId:guid}")]
-    public async Task<ActionResult<Guid>> ClearUsersCart(Guid userId)
+    [HttpDelete("clear")]
+    public async Task<ActionResult<Guid>> ClearUsersCart()
     {
-        return await cartService.ClearUsersCart(userId);
+        var userId = User.GetUserId();
+        var cartId = await cartService.ClearUsersCart(userId);
+        return Ok(cartId);
     }
 }

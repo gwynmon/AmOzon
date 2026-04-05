@@ -49,4 +49,22 @@ public class SellerRepository(AmOzonDbContext dbContext) : ISellerRepository
 
         return seller;
     }
+    
+    public async Task<Seller?> GetByUserId(Guid id)
+    {
+        var sellerEntity = await dbContext.Sellers
+            .FirstOrDefaultAsync(s => s.UserId == id);
+
+        if (sellerEntity == null)
+        {
+            return null;
+        }
+
+        var seller = Seller.Create(
+            sellerEntity.Id,
+            sellerEntity.UserId
+        );
+
+        return seller;
+    }
 }

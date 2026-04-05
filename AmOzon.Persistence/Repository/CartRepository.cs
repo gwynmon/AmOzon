@@ -25,22 +25,34 @@ public class CartRepository(AmOzonDbContext dbContext) : ICartRepository
         return cartItems;
     }
 
-    public Task<Guid> GetById(Guid itemId)
+    public async Task<CartItem?> GetById(Guid userId, Guid itemId)
     {
-        var cartItemEntity = dbContext.CartItems
-            .FirstOrDefault(ci => ci.Id == itemId);
+        var cartItemEntity = await dbContext.CartItems
+            .FirstOrDefaultAsync(ci => ci.Id == itemId && ci.UserId == userId);
+
+        if (cartItemEntity == null)
+        {
+            return null;
+        }
+
+        var cartItem = CartItem.Create(
+            cartItemEntity.Id,
+            cartItemEntity.CartQuantity,
+            cartItemEntity.ProductId,
+            cartItemEntity.UserId
+        );
         
-        return Task.FromResult(cartItemEntity.Id);
+        return cartItem;
     }
 
-    public async Task<Guid> AddProductToUsersCart(CartItem cartItem)
+    public async Task<Guid> AddProductToUsersCart(Guid userId, CartItem cartItem)
     {
         var cartItemEntity = new CartItemEntity
         {
             Id = cartItem.Id,
             CartQuantity = cartItem.CartQuantity,
             ProductId = cartItem.ProductId,
-            UserId = cartItem.UserId
+            UserId = userId
         };
         
         await dbContext.CartItems.AddAsync(cartItemEntity);
@@ -48,23 +60,32 @@ public class CartRepository(AmOzonDbContext dbContext) : ICartRepository
         return cartItemEntity.Id;
     }
 
-    public async Task<Guid> UpdateQuantity(Guid itemId, int quantity)
+    public async Task<Guid?> UpdateQuantity(Guid userId, Guid itemId, int quantity)
     {
         var cartItemEntity = await dbContext.CartItems
-            .FirstOrDefaultAsync(ci => ci.Id == itemId);
+            .FirstOrDefaultAsync(ci => ci.Id == itemId && ci.UserId == userId);
+
+        if (cartItemEntity == null)
+        {
+            return null;
+        }
 
         cartItemEntity.CartQuantity = quantity;
         await dbContext.SaveChangesAsync();
         return cartItemEntity.Id;
     }
 
-    public async Task<Guid> DeleteItem(Guid itemId)
+    public async Task<Guid?> DeleteItem(Guid userId, Guid itemId)
     {
-        await dbContext.CartItems
-            .Where(ci => ci.Id == itemId)
+        int rowsDeleted = await dbContext.CartItems
+            .Where(ci => ci.Id == itemId && ci.UserId == userId)
             .ExecuteDeleteAsync();
-        
-        await dbContext.SaveChangesAsync();
+
+        if (rowsDeleted == 0)
+        {
+            return null;
+        }
+
         return itemId;
     }
 

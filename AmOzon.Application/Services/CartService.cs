@@ -1,81 +1,70 @@
 using AmOzon.Application.Abstractions;
-using AmOzon.Contracts;
 using AmOzon.Domain.Abstractions;
 using AmOzon.Domain.Models;
-using AmOzon.Persistence.Repository;
-using Microsoft.AspNetCore.Mvc;
 
 namespace AmOzon.Application.Services;
 
 public class CartService(
     ICartRepository cartRepository,
-    IProductRepository productRepository,
-    IUserRepository userRepository)
+    IProductRepository productRepository)
     : ICartService
 {
 
-    public async Task<Guid> AddProductToUsersCart(AddProductToUsersCartRequest request)
+    public async Task<Guid> AddProductToUsersCart(Guid userId, Guid productId, int cartQuantity)
     {
-        var product = await productRepository.GetById(request.ProductId);
+        var product = await productRepository.GetById(productId);
 
         if (product == null)
         {
-            throw new ApplicationException($"Product with id {request.ProductId} not found");
+            throw new ApplicationException($"Product with id {productId} not found");
         }
         
         var cartItem = CartItem.Create(
             Guid.NewGuid(), 
-            request.CartQuantity, 
-            request.ProductId, 
-            request.UserId
+            cartQuantity, 
+            productId, 
+            userId
         );
         
-        return await cartRepository.AddProductToUsersCart(cartItem);
+        return await cartRepository.AddProductToUsersCart(userId, cartItem);
     }
 
-    public async Task<ActionResult<List<CartItem>>> GetUsersCartItems(Guid userId)
+    public async Task<List<CartItem>> GetUsersCartItems(Guid userId)
     {
-        var user = await userRepository.GetById(userId);
-        
-        if (user == null)
-        {
-            throw new ApplicationException($"User with id {userId} not found");
-        }
-        
         return await cartRepository.GetUsersCartItems(userId);
     }
 
-    public async Task<Guid> UpdateQuantity(Guid itemId, int quantity)
+    public async Task<Guid> UpdateQuantity(Guid userId, Guid itemId, int quantity)
     {
         if (quantity <= 0)
         {
             throw new ApplicationException("Quantity cannot be zero or negative");
         }
         
-        return await cartRepository.UpdateQuantity(itemId, quantity);
+        var id = await cartRepository.UpdateQuantity(userId, itemId, quantity);
+
+        if (id == null)
+        {
+            throw new ApplicationException($"Product with id {itemId} not found");
+        }
+
+        return id.Value;
     }
 
-    public async Task<Guid> DeleteItem(Guid itemId)
+    public async Task<Guid> DeleteItem(Guid userId, Guid itemId)
     {
-        var item = cartRepository.GetById(itemId);
+        var id = await cartRepository.DeleteItem(userId, itemId);
 
-        if (item == null)
+        if (id == null)
         {
-            throw new ApplicationException($"Item with id {itemId} not found");
+            throw new ApplicationException($"Product with id {itemId} not found");
         }
-        
-        return await cartRepository.DeleteItem(itemId);
+
+        return id.Value;
     }
 
     public async Task<Guid> ClearUsersCart(Guid userId)
     {
-        var item = cartRepository.GetUsersCartItems(userId);
-
-        if (item == null)
-        {
-            throw new ApplicationException($"Items for user with id {userId} not found");
-        }
-        
         return await cartRepository.ClearUsersCart(userId);
     }
 }

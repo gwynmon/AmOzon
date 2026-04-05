@@ -1,4 +1,4 @@
-namespace AmOzon.Contracts;
+namespace AmOzon.Contracts.Responses;
 
 public record ProductsResponse(
     Guid Id,

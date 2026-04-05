@@ -1,4 +1,4 @@
-namespace AmOzon.Contracts;
+namespace AmOzon.Contracts.Requests;
 
 public record UserRequest(
     string Name,

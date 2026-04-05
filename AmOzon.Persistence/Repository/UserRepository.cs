@@ -1,3 +1,4 @@
+using AmOzon.Contracts.Requests;
 using AmOzon.Domain.Abstractions;
 using AmOzon.Domain.Models;
 using AmOzon.Persistence.Entities;
@@ -54,6 +55,23 @@ public class UserRepository(AmOzonDbContext dbContext) : IUserRepository
         var userEntity = await dbContext.Users
             .Include(u => u.UserCredentialsEntity)
             .FirstOrDefaultAsync(u => u.Id == id);
+
+        var user = User.Create(
+            userEntity.Id,
+            userEntity.Name,
+            userEntity.Age,
+            userEntity.UserCredentialsEntity.Email,
+            userEntity.UserCredentialsEntity.Password
+        );
+        
+        return user;
+    }
+
+    public async Task<User?> GetByEmail(string email)
+    {
+        var userEntity = await dbContext.Users
+            .Include(u => u.UserCredentialsEntity)
+            .FirstOrDefaultAsync(u => u.UserCredentialsEntity.Email == email);
 
         var user = User.Create(
             userEntity.Id,
