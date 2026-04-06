@@ -1,4 +1,5 @@
 using AmOzon.Application.Abstractions;
+using AmOzon.Application.Commands;
 using AmOzon.Contracts.Requests;
 using AmOzon.Contracts.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,8 @@ public class ProductsController(IProductService productService) : ControllerBase
     [Authorize(Roles = "Seller")]
     public async Task<ActionResult<Guid>> CreateProduct([FromBody] ProductsCreateRequest request)
     {
-        var productId = await productService.CreateProductAsync(request);
+        var command = request.Adapt<CreateProductCommand>();
+        var productId = await productService.CreateProductAsync(command);
         return CreatedAtAction(nameof(GetProductById), new { id = productId }, productId); 
     }
     
@@ -47,7 +49,9 @@ public class ProductsController(IProductService productService) : ControllerBase
     [Authorize(Roles = "Seller")]
     public async Task<ActionResult<Guid>> UpdateProduct(Guid id, [FromBody] ProductsUpdateRequest request)
     {
-        var productId = await productService.UpdateProduct(id, request);
+        var command = request.Adapt<UpdateProductCommand>();
+        command = command with { Id = id };
+        var productId = await productService.UpdateProduct(command);
         return Ok(productId);
     }
 

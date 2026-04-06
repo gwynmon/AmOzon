@@ -13,7 +13,7 @@
     networks:
       - amozon-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -26,7 +26,7 @@
     environment:
       ConnectionStrings__AmOzonDbContext: "Host=db;Port=5432;Database=AmOzonDb;Username=postgres;Password=postgres_password_123"
       
-      JwtSettings__SecretKey: "SuperSecretKey_That_Is_Long_Enough_For_HS256_Algorithm_12345!"
+      JwtSettings__SecretKey: "X7k9#mP2$vL5@nQ8!wR3&yT6^uI0*oA4(sD1)fG7_hJ2+kM5-zC8/xV3?bN6"
       JwtSettings__Issuer: "AmOzonAPI"
       JwtSettings__Audience: "AmOzonClient"
       JwtSettings__ExpirationInMinutes: "60"
@@ -40,7 +40,6 @@
         condition: service_healthy
     networks:
       - amozon-network
-    restart: unless-stopped
 
 volumes:
   pgdata:

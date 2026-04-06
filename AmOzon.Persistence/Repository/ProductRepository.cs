@@ -7,27 +7,28 @@ namespace AmOzon.Persistence.Repository;
 
 public class ProductRepository(AmOzonDbContext dbContext) : IProductRepository
 {
+    private static Product MapToDomain(ProductEntity entity)
+    {
+        return Product.Create(
+            entity.Id,
+            entity.Name,
+            entity.Description,
+            entity.CreatedAt,
+            entity.Price,
+            entity.StockQuantity,
+            entity.SellerId,
+            entity.IsDeleted
+        );
+    }
     public async Task<List<Product>> GetAll()
     {
         var productEntities = await dbContext.Products
             .AsNoTracking()
             .ToListAsync();
 
-        var products = productEntities
-            .Select(p => Product.Create(
-                p.Id, 
-                p.Name, 
-                p.Description, 
-                p.CreatedAt, 
-                p.Price, 
-                p.StockQuantity, 
-                p.SellerId, 
-                p.IsDeleted
-                ))
+        return productEntities
+            .Select(MapToDomain)
             .ToList();
-        Console.WriteLine(productEntities.Count);
-        Console.WriteLine(products.Count);
-        return products;
     }
 
     public async Task<Product?> GetById(Guid id)
@@ -40,44 +41,29 @@ public class ProductRepository(AmOzonDbContext dbContext) : IProductRepository
             return null;
         }
 
-        var product = Product.Create(
-            productEntity.Id,
-            productEntity.Name,
-            productEntity.Description,
-            productEntity.CreatedAt,
-            productEntity.Price,
-            productEntity.StockQuantity,
-            productEntity.SellerId,
-            productEntity.IsDeleted
-            );
-
-        return product;
+        return MapToDomain(productEntity);
     }
 
     public async Task<List<Product>> GetBySellerId(Guid id)
     {
-        var  productEntities = await dbContext.Products
+        var productEntities = await dbContext.Products
             .AsNoTracking()
             .ToListAsync();
 
-        var products = productEntities
-            .Select(p => Product.Create(
-                    p.Id,
-                    p.Name,
-                    p.Description,
-                    p.CreatedAt,
-                    p.Price,
-                    p.StockQuantity,
-                    p.SellerId,
-                    p.IsDeleted
-                ))
-                .ToList();
-
-        return products;
+        return productEntities
+            .Select(MapToDomain)
+            .ToList();
     }
 
-    public async Task<Guid> Create(Product product)
+    public async Task<Guid?> Create(Product product)
     {
+        bool sellerExists = await dbContext.Sellers.AnyAsync(s => s.Id == product.SellerId);
+
+        if (!sellerExists)
+        {
+            return null;
+        }
+        
         var productEntity = new ProductEntity
         {
             Id = product.Id,
@@ -98,13 +84,18 @@ public class ProductRepository(AmOzonDbContext dbContext) : IProductRepository
 
     public async Task<Guid> Update(Product product)
     {
-        await dbContext.Products
+        var rowsUpdated = await dbContext.Products
             .Where(p => p.Id == product.Id)
             .ExecuteUpdateAsync(s => s
                 .SetProperty(p => p.Name, product.Name)
                 .SetProperty(p => p.Description, product.Description)
                 .SetProperty(p => p.Price, product.Price)
                 .SetProperty(p => p.StockQuantity, product.StockQuantity));
+
+        if (rowsUpdated == 0)
+        {
+            return Guid.Empty;
+        }
         
         await dbContext.SaveChangesAsync();
         return product.Id;

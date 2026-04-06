@@ -32,12 +32,12 @@ public class Product
         Guid id, string name, string description, DateTime createdAt,
         decimal price, int stockQuantity, Guid sellerId, bool isDeleted)
     {
-        if (stockQuantity > 1000)
+        if (stockQuantity > ValidationConstants.MaxStockQuantity)
         {
             throw new ValidationException("Stock quantity must be less than 1000");
         }
         
-        if (price > 1000)
+        if (price > ValidationConstants.MaxProductPrice)
         {
             throw new ValidationException("Price must be less than 1000");
         }
@@ -47,7 +47,7 @@ public class Product
         
         return product;
     }
-    
+
     public void Update(string newName, string newDescription, 
         decimal newPrice, int newStockQuantity)
     {

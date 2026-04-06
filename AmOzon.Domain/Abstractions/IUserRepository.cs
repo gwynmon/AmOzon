@@ -7,6 +7,6 @@ public interface IUserRepository
 {
     Task<Guid> Create(User user);
     Task<List<User>> GetAll();
-    Task<User> GetById(Guid id);
+    Task<User?> GetById(Guid id);
     Task<User?> GetByEmail(string email);
 }

@@ -22,7 +22,7 @@ public class UserCredentialsConfiguration : IEntityTypeConfiguration<UserCredent
             .IsRequired();
         
         builder.Property(uc => uc.Password)
-            .HasMaxLength(ValidationConstants.MaxPasswordHashLength)
+            .HasMaxLength(ValidationConstants.MaxPasswordLength)
             .IsRequired();
         
         builder.HasIndex(uc => uc.Email)

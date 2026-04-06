@@ -4,5 +4,5 @@ public record CreateUserCommand (
     string  Name,
     int Age,
     string Email,
-    string PasswordHash
+    string Password
     );

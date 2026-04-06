@@ -16,8 +16,8 @@ public class UserController(IUserService userService) : ControllerBase
     public async Task<ActionResult<Guid>> CreateUser([FromBody] UserRequest request)
     {
         var command = request.Adapt<CreateUserCommand>();
-        var sellerId = await userService.CreateUserAsync(command);
-        return Ok(sellerId); 
+        var userId = await userService.CreateUserAsync(command);
+        return Ok(userId); 
     }
 
     [HttpGet("get-all")]

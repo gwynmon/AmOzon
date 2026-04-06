@@ -95,7 +95,6 @@ public class CartRepository(AmOzonDbContext dbContext) : ICartRepository
             .Where(ci => ci.UserId == userId)
             .ExecuteDeleteAsync();
         
-        await dbContext.SaveChangesAsync();
         return userId;
     }
 }

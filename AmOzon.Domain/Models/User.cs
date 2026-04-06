@@ -19,7 +19,7 @@ public class User
     public string Email { get; }
     public string Password { get; }
 
-    public static User Create(Guid id, string name, int age, string email, string passwordHash)
+    public static User Create(Guid id, string name, int age, string email, string password)
     {
         if (id == Guid.Empty)
         {
@@ -41,12 +41,12 @@ public class User
             throw new ValidationException("Invalid user email.");
         }   
 
-        if (string.IsNullOrWhiteSpace(passwordHash))
+        if (string.IsNullOrWhiteSpace(password))
         {
-            throw new ValidationException("Invalid user password hash.");
+            throw new ValidationException("Invalid user password.");
         }
         
-        var user = new User(id, name, age,  email, passwordHash);
+        var user = new User(id, name, age,  email, password);
         
         return user;
     }
