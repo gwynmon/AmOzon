@@ -48,7 +48,7 @@ namespace AmOzon.Persistence.Migrations
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    Password = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false)
+                    Password = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
