@@ -70,11 +70,17 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+try
 {
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<AmOzonDbContext>();
-    await context.Database.MigrateAsync(); 
+    await context.Database.MigrateAsync();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"{ex.Message}");
+    Console.WriteLine($"{ex.StackTrace}");
 }
 
 app.UseAuthentication();
