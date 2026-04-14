@@ -1,0 +1,60 @@
+@model List<AmOzon.Contracts.Responses.CartItemResponse>
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 mb-0">Cart</h2>
+        @if (Model.Any())
+        {
+            <form asp-controller="Cart" asp-action="Clear" method="post">
+                @Html.AntiForgeryToken()
+                <button class="btn btn-sm btn-outline-danger" type="submit">Clear cart</button>
+            </form>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Cart is empty.</div>
+    }
+    else
+    {
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Product ID</th>
+                    <th>Quantity</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td><code>@item.Id</code></td>
+                        <td><code>@item.ProductId</code></td>
+                        <td>
+                            <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" class="d-flex gap-2">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="itemId" value="@item.Id" />
+                                <input type="number" name="quantity" value="@item.CartQuantity" min="1" class="form-control form-control-sm" style="width: 90px;" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
+                            </form>
+                        </td>
+                        <td class="text-end">
+                            <form asp-controller="Cart" asp-action="Delete" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="itemId" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

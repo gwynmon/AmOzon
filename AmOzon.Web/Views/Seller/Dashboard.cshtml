@@ -1,0 +1,34 @@
+@model SellerDashboardViewModel
+
+@{
+    ViewData["Title"] = "Seller Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="h4 mb-1">Seller Dashboard</h2>
+    <p class="text-muted">Seller ID: <code>@Model.Seller.Id</code></p>
+
+    <div class="card">
+        <div class="card-header bg-white">
+            Products (@Model.Products.Count)
+        </div>
+        <div class="card-body">
+            @if (!Model.Products.Any())
+            {
+                <p class="text-muted mb-0">No products yet.</p>
+            }
+            else
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var product in Model.Products)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>@product.Name</span>
+                            <a asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>

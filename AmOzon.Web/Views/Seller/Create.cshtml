@@ -1,0 +1,13 @@
+@{
+    ViewData["Title"] = "Become Seller";
+}
+
+<div class="container mt-4">
+    <h2 class="h4">Become a Seller</h2>
+    <p class="text-muted">Create a seller profile to access product management endpoints.</p>
+
+    <form asp-controller="Seller" asp-action="CreateSeller" method="post">
+        @Html.AntiForgeryToken()
+        <button class="btn btn-success" type="submit">Create seller profile</button>
+    </form>
+</div>
