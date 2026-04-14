@@ -90,7 +90,7 @@ public class CartController(IHttpClientFactory httpClientFactory) : Controller
         var client = CreateAuthorizedClientOrNull();
         if (client is null)
         {
-            return RedirectToAction("Login", "Account");docker compose down
+            return RedirectToAction("Login", "Account");
         }
 
         await client.DeleteAsync("/api/cart/clear");
