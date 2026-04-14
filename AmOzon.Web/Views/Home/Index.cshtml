@@ -2,7 +2,17 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="p-5 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-4">
+        <h1 class="display-6 fw-bold">AmOzon Frontend</h1>
+        <p class="col-md-8 fs-5">
+            Этот сайт содержит нефильтрованный вайбкод для демонстрации API. Но если вам важно качество - посмотрите в исходники и потыкайте Swagger. Там, надеюсь, код порадует вас куда больше.
+        </p>
+        <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-primary" asp-controller="Products" asp-action="Index">Browse products</a>
+            <a class="btn btn-outline-primary" asp-controller="Account" asp-action="Register">Register</a>
+            <a class="btn btn-outline-secondary" asp-controller="Account" asp-action="Login">Login</a>
+            <a class="btn btn-outline-success" asp-controller="Seller" asp-action="Index">Sellers</a>
+        </div>
+    </div>
 </div>

@@ -4,8 +4,15 @@ using System.Net.Http.Headers;
 
 namespace AmOzon.Web.Controllers;
 
-public class CartController(IHttpClientFactory httpClientFactory) : Controller
+public class CartController : Controller
 {
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public CartController(IHttpClientFactory httpClientFactory)
+    {
+        _httpClientFactory = httpClientFactory;
+    }
+
     public async Task<IActionResult> Index()
     {
         var client = CreateAuthorizedClientOrNull();
@@ -22,7 +29,7 @@ public class CartController(IHttpClientFactory httpClientFactory) : Controller
         }
 
         var items = await response.Content.ReadFromJsonAsync<List<CartItemResponse>>();
-        return View(items ?? []);
+        return View(items ?? new List<CartItemResponse>());
     }
 
     [HttpPost]
@@ -105,7 +112,7 @@ public class CartController(IHttpClientFactory httpClientFactory) : Controller
             return null;
         }
 
-        var client = httpClientFactory.CreateClient("Api");
+        var client = _httpClientFactory.CreateClient("Api");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return client;
     }

@@ -14,19 +14,19 @@
     {
         <table class="table">
             <thead>
-                <tr>
-                    <th>Seller ID</th>
-                    <th>User ID</th>
-                </tr>
+            <tr>
+                <th>Seller ID</th>
+                <th>User ID</th>
+            </tr>
             </thead>
             <tbody>
-                @foreach (var seller in Model)
-                {
-                    <tr>
-                        <td><code>@seller.Id</code></td>
-                        <td><code>@seller.UserId</code></td>
-                    </tr>
-                }
+            @foreach (var seller in Model)
+            {
+                <tr>
+                    <td><code>@seller.Id</code></td>
+                    <td><code>@seller.UserId</code></td>
+                </tr>
+            }
             </tbody>
         </table>
     }

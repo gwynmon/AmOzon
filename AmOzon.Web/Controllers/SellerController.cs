@@ -6,11 +6,18 @@ using System.Net.Http.Headers;
 
 namespace AmOzon.Web.Controllers;
 
-public class SellerController(IHttpClientFactory httpClientFactory) : Controller
+public class SellerController : Controller
 {
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public SellerController(IHttpClientFactory httpClientFactory)
+    {
+        _httpClientFactory = httpClientFactory;
+    }
+
     public async Task<IActionResult> Index()
     {
-        var client = httpClientFactory.CreateClient("Api");
+        var client = _httpClientFactory.CreateClient("Api");
         var response = await client.GetAsync("/api/sellers/get-all");
         if (!response.IsSuccessStatusCode)
         {
@@ -18,7 +25,7 @@ public class SellerController(IHttpClientFactory httpClientFactory) : Controller
         }
 
         var sellers = await response.Content.ReadFromJsonAsync<List<SellerResponse>>();
-        return View(sellers ?? []);
+        return View(sellers ?? new List<SellerResponse>());
     }
 
     public async Task<IActionResult> Dashboard()
@@ -37,7 +44,7 @@ public class SellerController(IHttpClientFactory httpClientFactory) : Controller
             return RedirectToAction("Profile", "Account");
         }
 
-        var sellers = await sellersResponse.Content.ReadFromJsonAsync<List<SellerResponse>>() ?? [];
+        var sellers = await sellersResponse.Content.ReadFromJsonAsync<List<SellerResponse>>() ?? new List<SellerResponse>();
         var seller = sellers.FirstOrDefault(x => x.UserId == userId);
         if (seller is null)
         {
@@ -47,8 +54,8 @@ public class SellerController(IHttpClientFactory httpClientFactory) : Controller
 
         var productsResponse = await client.GetAsync($"/api/products/get-by-seller/{seller.Id}");
         var products = productsResponse.IsSuccessStatusCode
-            ? await productsResponse.Content.ReadFromJsonAsync<List<ProductsResponse>>() ?? []
-            : [];
+            ? await productsResponse.Content.ReadFromJsonAsync<List<ProductsResponse>>() ?? new List<ProductsResponse>()
+            : new List<ProductsResponse>();
 
         var model = new SellerDashboardViewModel
         {
@@ -105,7 +112,7 @@ public class SellerController(IHttpClientFactory httpClientFactory) : Controller
 
     private HttpClient CreateAuthorizedApiClient(string token)
     {
-        var client = httpClientFactory.CreateClient("Api");
+        var client = _httpClientFactory.CreateClient("Api");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return client;
     }
