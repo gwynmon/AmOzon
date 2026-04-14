@@ -1,8 +1,9 @@
 var builder = WebApplication.CreateBuilder(args);
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5013";
 
 builder.Services.AddHttpClient("Api", client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5013");
+    client.BaseAddress = new Uri(apiBaseUrl);
 });
 
 builder.Services.AddAuthentication("Cookies")

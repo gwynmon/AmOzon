@@ -26,7 +26,7 @@
     environment:
       ConnectionStrings__AmOzonDbContext: "Host=db;Port=5432;Database=AmOzonDb;Username=postgres;Password=postgres_password_123"
       
-      JwtSettings__SecretKey: "X7k9#mP2$vL5@nQ8!wR3&yT6^uI0*oA4(sD1)fG7_hJ2+kM5-zC8/xV3?bN6"
+      JwtSettings__SecretKey: "X7k9#mP2$$vL5@nQ8!wR3&yT6^uI0*oA4(sD1)fG7_hJ2+kM5-zC8/xV3?bN6"
       JwtSettings__Issuer: "AmOzonAPI"
       JwtSettings__Audience: "AmOzonClient"
       JwtSettings__ExpirationInMinutes: "60"
@@ -38,6 +38,23 @@
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - amozon-network
+  
+  web:
+    build:
+      context: .
+      dockerfile: AmOzon.Web/Dockerfile
+    container_name: amozon-web
+    environment:
+      ApiBaseUrl: "http://api:8080"
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8080"
+    ports:
+      - "8088:8080"
+    depends_on:
+      api:
+        condition: service_started
     networks:
       - amozon-network
 
