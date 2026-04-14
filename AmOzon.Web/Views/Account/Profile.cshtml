@@ -1,0 +1,262 @@
+@model UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Личный кабинет";
+}
+
+<div class="container py-5">
+    <!-- Заголовок страницы -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">👤 Личный кабинет</h1>
+        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+                🚪 Выйти
+            </button>
+        </form>
+    </div>
+
+    <!-- Уведомления -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Боковая панель -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <!-- Аватар с инициалом -->
+                    <div class="mb-3">
+                        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center fw-bold" 
+                             style="width: 100px; height: 100px; font-size: 36px;">
+                            @Model.Name[0].ToString().ToUpper()
+                        </div>
+                    </div>
+                    
+                    <!-- Имя и роль -->
+                    <h5 class="card-title mb-1">@Model.Name</h5>
+                    <p class="text-muted small mb-2">@Model.Email</p>
+                    
+                    @if (Model.IsSeller)
+                    {
+                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                            ✓ Продавец
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">
+                            Покупатель
+                        </span>
+                    }
+                </div>
+                
+                <!-- Навигация -->
+                <div class="list-group list-group-flush">
+                    <a asp-controller="Account" asp-action="Profile" 
+                       class="list-group-item list-group-item-action active"
+                       aria-current="true">
+                        🏠 Главная
+                    </a>
+                    <a asp-controller="Cart" asp-action="Index" 
+                       class="list-group-item list-group-item-action">
+                        🛒 Корзина
+                        @if (Model.CartItemsCount > 0)
+                        {
+                            <span class="badge bg-primary rounded-pill float-end">@Model.CartItemsCount</span>
+                        }
+                    </a>
+                    
+                    @if (Model.IsSeller)
+                    {
+                        <a asp-controller="Products" asp-action="MyProducts" 
+                           class="list-group-item list-group-item-action">
+                            📦 Мои товары
+                            @if (Model.ProductsCount > 0)
+                            {
+                                <span class="badge bg-info rounded-pill float-end">@Model.ProductsCount</span>
+                            }
+                        </a>
+                        <a asp-controller="Seller" asp-action="Dashboard" 
+                           class="list-group-item list-group-item-action">
+                            📊 Статистика
+                        </a>
+                    }
+                    else
+                    {
+                        <!-- Кнопка "Стать продавцом" для обычных пользователей -->
+                        <a asp-controller="Seller" asp-action="Create" 
+                           class="list-group-item list-group-item-action text-success">
+                            ✨ Стать продавцом
+                        </a>
+                    }
+                    
+                    <a asp-controller="Account" asp-action="Orders" 
+                       class="list-group-item list-group-item-action">
+                        📋 Заказы
+                        @if (Model.OrdersCount > 0)
+                        {
+                            <span class="badge bg-warning text-dark rounded-pill float-end">@Model.OrdersCount</span>
+                        }
+                    </a>
+                    <a asp-controller="Account" asp-action="Settings" 
+                       class="list-group-item list-group-item-action">
+                        ⚙️ Настройки
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="col-lg-8">
+            
+            <!-- Карточка: Информация о пользователе -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">📋 Информация о профиле</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Имя</label>
+                            <input type="text" class="form-control" value="@Model.Name" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Email</label>
+                            <input type="email" class="form-control" value="@Model.Email" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Возраст</label>
+                            <input type="number" class="form-control" value="@Model.Age" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted small">Статус</label>
+                            <input type="text" class="form-control" 
+                                   value="@(@Model.IsSeller ? "Продавец" : "Покупатель")" 
+                                   readonly />
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <a asp-controller="Account" asp-action="EditProfile" class="btn btn-primary btn-sm">
+                            ✏️ Редактировать профиль
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Карточка: Статистика -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">📊 Статистика</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="p-3">
+                                <div class="display-6 fw-bold text-primary">@Model.OrdersCount</div>
+                                <div class="text-muted small">Заказов</div>
+                            </div>
+                        </div>
+                        <div class="col-4 border-start border-end">
+                            <div class="p-3">
+                                <div class="display-6 fw-bold text-success">@Model.CartItemsCount</div>
+                                <div class="text-muted small">В корзине</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-3">
+                                <div class="display-6 fw-bold text-info">@Model.ProductsCount</div>
+                                <div class="text-muted small">Товаров</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Карточка: Последние заказы -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📋 Последние заказы</h5>
+                    @if (Model.RecentOrders?.Any() == true)
+                    {
+                        <a asp-controller="Account" asp-action="Orders" class="btn btn-sm btn-outline-primary">
+                            Все заказы
+                        </a>
+                    }
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentOrders != null && Model.RecentOrders.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Заказ</th>
+                                        <th>Дата</th>
+                                        <th>Сумма</th>
+                                        <th>Статус</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model.RecentOrders.Take(5))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <small class="text-muted">#@order.Id.ToString().Substring(0, 8)...</small>
+                                            </td>
+                                            <td>@order.CreatedAt.ToString("dd.MM.yyyy")</td>
+                                            <td class="fw-bold">@order.TotalAmount.ToString("N0") ₽</td>
+                                            <td>
+                                                @{
+                                                    var badgeClass = order.Status switch
+                                                    {
+                                                        "Completed" => "success",
+                                                        "Processing" => "warning",
+                                                        "Cancelled" => "danger",
+                                                        _ => "secondary"
+                                                    };
+                                                }
+                                                <span class="badge bg-@badgeClass">@order.Status</span>
+                                            </td>
+                                            <td class="text-end">
+                                                <a asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id" 
+                                                   class="btn btn-sm btn-outline-secondary">
+                                                    →
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <div class="text-muted mb-2">📭</div>
+                            <p class="text-muted mb-0">У вас пока нет заказов</p>
+                            <a asp-controller="Products" asp-action="Index" class="btn btn-sm btn-outline-primary mt-2">
+                                Перейти к покупкам
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

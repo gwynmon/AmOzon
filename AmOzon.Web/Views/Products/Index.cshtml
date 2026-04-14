@@ -1,0 +1,32 @@
+@model List<AmOzon.Contracts.Responses.ProductsResponse>
+
+    @{
+    ViewData["Title"] = "Каталог товаров";
+}
+
+<div class="container mt-4">
+    <h1>Product Catalog</h1>
+    
+    @if (Model.Count == 0)
+{
+    <div class="alert alert-info">Товаров пока нет. <a asp-controller="Products" asp-action="Create">Добавить первый?</a></div>
+}
+else
+{
+    <div class="row">
+        @foreach (var product in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+            <div class="card-body">
+            <h5 class="card-title">@product.Name</h5>
+            <p class="card-text text-muted">@product.Description</p>
+            <p class="text-success fw-bold">@product.Price ₽</p>
+            <small class="text-muted">Остаток: @product.StockQuantity шт.</small>
+            </div>
+            </div>
+            </div>
+    }
+    </div>
+}
+</div>

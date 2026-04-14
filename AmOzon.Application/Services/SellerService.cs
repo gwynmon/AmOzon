@@ -23,8 +23,13 @@ public class SellerService(ISellerRepository sellerRepository) : ISellerService
         return await sellerRepository.GetAll();
     }
 
-    public async Task<Seller> GetSeller(Guid id)
+    public async Task<Seller?> GetSeller(Guid id)
     {
         return await sellerRepository.GetById(id);
+    }
+
+    public async Task<Seller?> GetByUserId(Guid userId)
+    {
+        return await sellerRepository.GetByUserId(userId);
     }
 }

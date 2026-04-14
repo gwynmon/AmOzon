@@ -43,7 +43,7 @@ public class UserService(IUserRepository userRepository) : IUserService
         return await userRepository.GetAll();
     }
 
-    public async Task<User> GetUser(Guid id)
+    public async Task<User?> GetUser(Guid id)
     {
         return await userRepository.GetById(id);
     }

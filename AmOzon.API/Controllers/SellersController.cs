@@ -1,7 +1,6 @@
 using AmOzon.API.Extensions;
 using AmOzon.Application.Abstractions;
 using AmOzon.Contracts.Responses;
-using AmOzon.Domain.Models;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +9,7 @@ namespace AmOzon.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SellerController(ISellerService sellerService, IAuthService authService) : ControllerBase
+public class SellersController(ISellerService sellerService, IAuthService authService) : ControllerBase
 {
     [HttpPost("create")]
     [Authorize]

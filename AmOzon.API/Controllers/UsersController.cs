@@ -1,3 +1,4 @@
+using AmOzon.API.Extensions;
 using AmOzon.Application.Abstractions;
 using AmOzon.Application.Commands;
 using AmOzon.Contracts.Requests;
@@ -10,7 +11,7 @@ namespace AmOzon.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(IUserService userService) : ControllerBase
+public class UsersController(IUserService userService, IProfileService profileService) : ControllerBase
 {
     [HttpPost("create")]
     public async Task<ActionResult<Guid>> CreateUser([FromBody] UserRequest request)
@@ -18,6 +19,15 @@ public class UserController(IUserService userService) : ControllerBase
         var command = request.Adapt<CreateUserCommand>();
         var userId = await userService.CreateUserAsync(command);
         return Ok(userId); 
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<ActionResult<UserResponse>> GetThisUsersProfile()
+    {
+        var userId = User.GetUserId();
+        var profile = await profileService.GetUserProfile(userId);
+        return Ok(profile);
     }
 
     [HttpGet("get-all")]

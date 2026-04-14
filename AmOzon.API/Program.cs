@@ -67,9 +67,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 
 var app = builder.Build();
-
 try
 {
     using var scope = app.Services.CreateScope();
@@ -82,6 +82,13 @@ catch (Exception ex)
     Console.WriteLine($"{ex.Message}");
     Console.WriteLine($"{ex.StackTrace}");
 }
+
+app.UseCors(policy => policy
+    .WithOrigins("http://localhost:5216", "https://localhost:5001")
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials()
+);
 
 app.UseAuthentication();
 app.UseAuthorization();

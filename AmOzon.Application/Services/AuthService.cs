@@ -64,6 +64,13 @@ public class AuthService : IAuthService
         {
             role = UserRoles.Seller;
         }
+
+        // For debugging purpose. Yes, I know that it's bad
+        if (user.Name == "admin")
+        {
+            role = UserRoles.Admin;
+        }
+        
         
         var claims = new List<Claim>
         {

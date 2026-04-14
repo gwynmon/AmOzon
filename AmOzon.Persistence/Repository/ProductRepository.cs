@@ -47,6 +47,7 @@ public class ProductRepository(AmOzonDbContext dbContext) : IProductRepository
     public async Task<List<Product>> GetBySellerId(Guid id)
     {
         var productEntities = await dbContext.Products
+            .Where(p => p.SellerId == id)
             .AsNoTracking()
             .ToListAsync();
 
