@@ -4,5 +4,5 @@ namespace AmOzon.Application.Abstractions;
 
 public interface IProfileService
 {
-    Task<UserProfileResponse?> GetUserProfile(Guid userId);
+    Task<UserResponse?> GetUserProfile(Guid userId);
 }

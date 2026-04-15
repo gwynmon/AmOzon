@@ -5,5 +5,5 @@ public record UserResponse(
     string Name,
     int Age,
     string Email,
-    bool IsSeller
+    Guid? SellerId
 );

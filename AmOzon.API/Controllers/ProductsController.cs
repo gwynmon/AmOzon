@@ -13,7 +13,7 @@ namespace AmOzon.API.Controllers;
 public class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpPost("create")]
-    [Authorize(Roles = "Seller")]
+    [Authorize(Roles = "Seller,Admin")]
     public async Task<ActionResult<Guid>> CreateProduct([FromBody] ProductsCreateRequest request)
     {
         var command = request.Adapt<CreateProductCommand>();
@@ -46,7 +46,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpPut("update/{id:guid}")]
-    [Authorize(Roles = "Seller")]
+    [Authorize(Roles = "Seller,Admin")]
     public async Task<ActionResult<Guid>> UpdateProduct(Guid id, [FromBody] ProductsUpdateRequest request)
     {
         var command = request.Adapt<UpdateProductCommand>();
@@ -56,7 +56,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpPut("mark-deleted/{id:guid}")]
-    [Authorize(Roles = "Seller")]
+    [Authorize(Roles = "Seller,Admin")]
     public async Task<ActionResult<Guid>> MarkDeleted(Guid id)
     {
         var productId = await productService.MarkDeleted(id);

@@ -84,14 +84,22 @@ public class ProductsController(IHttpClientFactory httpClientFactory) : Controll
 
     public IActionResult Create()
     {
-        if (string.IsNullOrWhiteSpace(Request.Cookies["jwt_token"]))
-        {
+        var token = Request.Cookies["jwt_token"];
+    
+        if (string.IsNullOrWhiteSpace(token))
             return RedirectToAction("Login", "Account");
+        
+        Guid? userId = null;
+        if (TryGetUserIdFromToken(token, out var parsedUserId))
+        {
+            userId = parsedUserId;
         }
+        
+        var model = new ProductEditViewModel { UserId = userId };
 
-        return View("Upsert", new ProductEditViewModel());
+        return View("Upsert", model);
     }
-
+    
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ProductEditViewModel model)
@@ -102,30 +110,47 @@ public class ProductsController(IHttpClientFactory httpClientFactory) : Controll
         }
 
         var token = Request.Cookies["jwt_token"];
-        if (string.IsNullOrWhiteSpace(token) || !TryGetUserIdFromToken(token, out var userId))
+        if (string.IsNullOrWhiteSpace(token) || !TryGetUserIdFromToken(token, out var currentUserId))
         {
             return RedirectToAction("Login", "Account");
         }
 
+        if (model.UserId.HasValue && model.UserId.Value != currentUserId)
+        {
+            ModelState.AddModelError(string.Empty, "Security validation failed.");
+            return View("Upsert", model);
+        }
+
         var client = CreateAuthorizedClient(token);
-        var sellerId = await ResolveSellerIdByUser(client, userId);
+    
+        var sellerId = await ResolveSellerIdByUser(client, currentUserId);
+    
         if (sellerId is null)
         {
             TempData["ErrorMessage"] = "Become a seller first.";
             return RedirectToAction("Create", "Seller");
         }
 
-        var request = new ProductsCreateRequest(model.Name, model.Description, model.Price, model.StockQuantity, sellerId.Value);
+        var request = new ProductsCreateRequest(
+            model.Name, 
+            model.Description, 
+            model.Price, 
+            model.StockQuantity, 
+            sellerId.Value
+        );
+    
         var response = await client.PostAsJsonAsync("/api/products/create", request);
+    
         if (!response.IsSuccessStatusCode)
         {
+            var errorContent = await response.Content.ReadAsStringAsync();
             ModelState.AddModelError(string.Empty, "Failed to create product.");
             return View("Upsert", model);
         }
 
         return RedirectToAction(nameof(MyProducts));
     }
-
+    
     public async Task<IActionResult> Edit(Guid id)
     {
         var client = httpClientFactory.CreateClient("Api");

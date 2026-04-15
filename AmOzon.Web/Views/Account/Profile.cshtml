@@ -1,4 +1,4 @@
-ç@model UserProfileViewModel
+@model UserProfileViewModel
 
 @{
     ViewData["Title"] = "Личный кабинет";
@@ -49,7 +49,7 @@
                     <h5 class="card-title mb-1">@Model.Name</h5>
                     <p class="text-muted small mb-2">@Model.Email</p>
                     
-                    @if (Model.IsSeller)
+                    @if (Model.SellerId != null)
                     {
                         <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
                             ✓ Продавец
@@ -79,7 +79,7 @@
                         }
                     </a>
                     
-                    @if (Model.IsSeller)
+                    @if (Model.SellerId != null)
                     {
                         <a asp-controller="Products" asp-action="MyProducts" 
                            class="list-group-item list-group-item-action">
@@ -144,7 +144,7 @@
                         <div class="col-md-6">
                             <label class="form-label text-muted small">Статус</label>
                             <input type="text" class="form-control" 
-                                   value="@(@Model.IsSeller ? "Продавец" : "Покупатель")" 
+                                   value="@(@Model.SellerId != null ? "Продавец" : "Покупатель")" 
                                    readonly />
                         </div>
                     </div>

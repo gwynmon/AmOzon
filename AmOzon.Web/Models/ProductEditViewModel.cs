@@ -1,5 +1,6 @@
 using AmOzon.Contracts.Responses;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AmOzon.Web.Models;
 
@@ -18,6 +19,8 @@ public class ProductEditViewModel
 
     [Range(0, 1_000_000)]
     public int StockQuantity { get; set; }
+    [HiddenInput] 
+    public Guid? UserId { get; set; }
 }
 
 public class ProductDetailsPageViewModel

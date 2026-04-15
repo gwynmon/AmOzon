@@ -106,7 +106,7 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Login));
         }
 
-        var profile = await profileResponse.Content.ReadFromJsonAsync<UserProfileResponse>();
+        var profile = await profileResponse.Content.ReadFromJsonAsync<UserResponse>();
         if (profile is null)
         {
             Response.Cookies.Delete("jwt_token");
@@ -119,7 +119,7 @@ public class AccountController : Controller
             Name = profile.Name,
             Age = profile.Age,
             Email = profile.Email,
-            IsSeller = profile.IsSeller
+            SellerId = profile.SellerId
         };
 
         var cartResponse = await client.GetAsync("/api/cart/get-items");

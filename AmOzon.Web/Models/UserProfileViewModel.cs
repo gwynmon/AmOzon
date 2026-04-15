@@ -6,7 +6,7 @@ public class UserProfileViewModel
     public string Name { get; set; } = string.Empty;
     public int Age { get; set; }
     public string Email { get; set; } = string.Empty;
-    public bool IsSeller { get; set; }
+    public Guid? SellerId { get; set; }
     
     // Статистика (заглушки, пока не подключишь реальные эндпоинты)
     public int OrdersCount { get; set; }

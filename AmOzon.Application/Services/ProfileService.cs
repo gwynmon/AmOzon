@@ -14,21 +14,27 @@ public class ProfileService : IProfileService
         _sellerService = sellerService;
     }
 
-    public async Task<UserProfileResponse?> GetUserProfile(Guid userId)
+    public async Task<UserResponse?> GetUserProfile(Guid userId)
     {
         var user = await _userService.GetUser(userId);
         if (user == null) return null;
 
-        // 2. Проверяем наличие продавца (1 запрос)
         var seller = await _sellerService.GetByUserId(userId);
+
+        Guid? sellerId = null;
+
+        if (seller != null)
+        {
+            sellerId = seller.Id;
+        }
         
-        return new UserProfileResponse
+        return new UserResponse
         (
             user.Id,
             user.Name,
-            user.Email,
             user.Age,
-            seller != null
+            user.Email,
+            sellerId
         );
     }
 }
