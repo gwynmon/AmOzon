@@ -9,7 +9,6 @@
     <ItemGroup>
       <ProjectReference Include="..\AmOzon.Contracts\AmOzon.Contracts.csproj" />
       <ProjectReference Include="..\AmOzon.Domain\AmOzon.Domain.csproj" />
-      <ProjectReference Include="..\AmOzon.Persistence\AmOzon.Persistence.csproj" />
     </ItemGroup>
 
     <ItemGroup>

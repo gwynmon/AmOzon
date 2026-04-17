@@ -1,11 +1,12 @@
-using AmOzon.Domain.Models;
 using AmOzon.Persistence.Configurations;
 using AmOzon.Persistence.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace AmOzon.Persistence;
 
-public class AmOzonDbContext : DbContext
+public class AmOzonDbContext : IdentityDbContext<UserCredentialsEntity, IdentityRole<Guid>, Guid>
 {
     public AmOzonDbContext(DbContextOptions<AmOzonDbContext> options)
         : base(options)
@@ -20,8 +21,10 @@ public class AmOzonDbContext : DbContext
     public DbSet<OrderEntity> Orders { get; set; }
     public DbSet<OrderItemEntity> OrderItems { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
+        base.OnModelCreating(builder);
+        
+        builder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
     }
 }

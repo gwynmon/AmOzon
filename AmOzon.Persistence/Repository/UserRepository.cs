@@ -15,8 +15,7 @@ public class UserRepository(AmOzonDbContext dbContext) : IUserRepository
             entity.Id,
             entity.Name,
             entity.Age,
-            credentials.Email,
-            credentials.Password
+            credentials.Email
         );
     }
     
@@ -29,15 +28,7 @@ public class UserRepository(AmOzonDbContext dbContext) : IUserRepository
             Age = user.Age,
         };
 
-        var userCredentialsEntity = new UserCredentialsEntity()
-        {
-            UserId = user.Id,
-            Email = user.Email,
-            Password = user.Password
-        };
-
         await dbContext.Users.AddAsync(userEntity);
-        await dbContext.UserCredentials.AddAsync(userCredentialsEntity);
         await dbContext.SaveChangesAsync();
 
         return userEntity.Id;
@@ -79,5 +70,14 @@ public class UserRepository(AmOzonDbContext dbContext) : IUserRepository
         }
 
         return MapToDomain(userEntity);
+    }
+
+    public async Task DeleteByIdAsync(Guid userId)
+    {
+        await dbContext.Users
+            .Where(u => u.Id == userId)
+            .ExecuteDeleteAsync<UserEntity>();
+        
+        await dbContext.SaveChangesAsync();
     }
 }

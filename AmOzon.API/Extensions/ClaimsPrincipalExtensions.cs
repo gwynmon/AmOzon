@@ -1,24 +1,24 @@
-using System.Security.Claims;
+    using System.Security.Claims;
 
-namespace AmOzon.API.Extensions
-{
-    public static class ClaimsPrincipalExtensions
+    namespace AmOzon.API.Extensions
     {
-        public static Guid GetUserId(this ClaimsPrincipal user)
+        public static class ClaimsPrincipalExtensions
         {
-            var claim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(claim))
+            public static Guid GetUserId(this ClaimsPrincipal user)
             {
-                throw new UnauthorizedAccessException("User ID claim is missing in the token.");
-            }
+                var claim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (!Guid.TryParse(claim, out var userId))
-            {
-                throw new UnauthorizedAccessException("Invalid User ID format in the token.");
-            }
+                if (string.IsNullOrEmpty(claim))
+                {
+                    throw new UnauthorizedAccessException("User ID claim is missing in the token.");
+                }
 
-            return userId;
+                if (!Guid.TryParse(claim, out var userId))
+                {
+                    throw new UnauthorizedAccessException("Invalid User ID format in the token.");
+                }
+
+                return userId;
+            }
         }
     }
-}

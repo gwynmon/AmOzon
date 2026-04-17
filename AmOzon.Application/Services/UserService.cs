@@ -29,8 +29,7 @@ public class UserService(IUserRepository userRepository) : IUserService
             Guid.NewGuid(),
             command.Name,
             command.Age,
-            command.Email,
-            command.Password
+            command.Email
         );
 
         var userId = await userRepository.Create(user!);

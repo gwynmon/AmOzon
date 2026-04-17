@@ -13,7 +13,16 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
             .HasKey(u => u.Id);
         
         builder
-            .HasMany(s => s.ProductsInCart);
+            .HasMany(s => s.ProductsInCart)
+            .WithOne(u => u.User)
+            .HasForeignKey(ci => ci.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasOne(u => u.UserCredentialsEntity)
+            .WithOne(uc => uc.User)
+            .HasForeignKey<UserCredentialsEntity>(uc => uc.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
         
         builder
             .Property(u => u.Name)

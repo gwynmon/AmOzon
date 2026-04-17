@@ -4,22 +4,20 @@ namespace AmOzon.Domain.Models;
 
 public class User
 {
-    private User(Guid id, string name, int age, string email, string password)
+    private User(Guid id, string name, int age, string email)
     {
         Id = id;
         Name = name;
         Age = age;
         Email = email;
-        Password = password;
     }
 
     public Guid Id { get; }
     public string Name { get; }
     public int Age { get; }
     public string Email { get; }
-    public string Password { get; }
 
-    public static User Create(Guid id, string name, int age, string email, string password)
+    public static User Create(Guid id, string name, int age, string email)
     {
         if (id == Guid.Empty)
         {
@@ -40,13 +38,8 @@ public class User
         {
             throw new ValidationException("Invalid user email.");
         }   
-
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            throw new ValidationException("Invalid user password.");
-        }
         
-        var user = new User(id, name, age,  email, password);
+        var user = new User(id, name, age,  email);
         
         return user;
     }

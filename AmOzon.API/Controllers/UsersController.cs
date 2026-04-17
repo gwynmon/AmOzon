@@ -14,6 +14,7 @@ namespace AmOzon.API.Controllers;
 public class UsersController(IUserService userService, IProfileService profileService) : ControllerBase
 {
     [HttpPost("create")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Guid>> CreateUser([FromBody] UserRequest request)
     {
         var command = request.Adapt<CreateUserCommand>();
