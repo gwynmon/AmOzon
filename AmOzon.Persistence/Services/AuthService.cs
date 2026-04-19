@@ -58,7 +58,7 @@ public class AuthService : IAuthService
         
         await _userManager.ResetAccessFailedCountAsync(credentials);
         
-        var user = await _userRepository.GetById(credentials.UserId);
+        var user = await _userRepository.GetById(credentials.Id);
         if (user == null)
         {
             return null;
@@ -81,7 +81,7 @@ public class AuthService : IAuthService
         
         var credentials = new UserCredentialsEntity
         {
-            UserId = user.Id,
+            Id = user.Id,
             UserName = request.Email,
             Email = request.Email,
             EmailConfirmed = false

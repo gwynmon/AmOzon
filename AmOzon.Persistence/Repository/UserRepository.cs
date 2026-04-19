@@ -28,7 +28,7 @@ public class UserRepository(AmOzonDbContext dbContext) : IUserRepository
             Age = user.Age,
         };
 
-        await dbContext.Users.AddAsync(userEntity);
+        await dbContext.DomainUsers.AddAsync(userEntity);
         await dbContext.SaveChangesAsync();
 
         return userEntity.Id;
@@ -36,7 +36,7 @@ public class UserRepository(AmOzonDbContext dbContext) : IUserRepository
 
     public async Task<List<User>> GetAll()
     {
-        var userEntities = await dbContext.Users
+        var userEntities = await dbContext.DomainUsers
             .AsNoTracking()
             .Include(u => u.UserCredentialsEntity) // Подгружаем credentials
             .ToListAsync();
@@ -46,7 +46,7 @@ public class UserRepository(AmOzonDbContext dbContext) : IUserRepository
 
     public async Task<User?> GetById(Guid id)
     {
-        var userEntity = await dbContext.Users
+        var userEntity = await dbContext.DomainUsers
             .Include(u => u.UserCredentialsEntity)
             .FirstOrDefaultAsync(u => u.Id == id);
 
@@ -60,7 +60,7 @@ public class UserRepository(AmOzonDbContext dbContext) : IUserRepository
 
     public async Task<User?> GetByEmail(string email)
     {
-        var userEntity = await dbContext.Users
+        var userEntity = await dbContext.DomainUsers
             .Include(u => u.UserCredentialsEntity)
             .FirstOrDefaultAsync(u => u.UserCredentialsEntity.Email == email);
 
@@ -74,7 +74,7 @@ public class UserRepository(AmOzonDbContext dbContext) : IUserRepository
 
     public async Task DeleteByIdAsync(Guid userId)
     {
-        await dbContext.Users
+        await dbContext.DomainUsers
             .Where(u => u.Id == userId)
             .ExecuteDeleteAsync<UserEntity>();
         

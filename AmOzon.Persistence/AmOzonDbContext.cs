@@ -15,7 +15,7 @@ public class AmOzonDbContext : IdentityDbContext<UserCredentialsEntity, Identity
     
     public DbSet<ProductEntity> Products { get; set; }
     public DbSet<SellerEntity> Sellers { get; set; }
-    public DbSet<UserEntity> Users { get; set; }
+    public DbSet<UserEntity> DomainUsers { get; set; }
     public DbSet<CartItemEntity> CartItems { get; set; }
     public DbSet<UserCredentialsEntity> UserCredentials { get; set; }
     public DbSet<OrderEntity> Orders { get; set; }

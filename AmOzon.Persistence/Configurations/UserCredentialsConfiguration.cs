@@ -14,7 +14,7 @@ public class UserCredentialsConfiguration : IEntityTypeConfiguration<UserCredent
         builder
             .HasOne(uc => uc.User)
             .WithOne(u => u.UserCredentialsEntity)
-            .HasForeignKey<UserCredentialsEntity>(uc => uc.UserId)
+            .HasForeignKey<UserCredentialsEntity>(uc => uc.Id)
             .OnDelete(DeleteBehavior.Cascade);
         
         builder.Property(uc => uc.UserName)

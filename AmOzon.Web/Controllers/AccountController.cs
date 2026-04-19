@@ -79,7 +79,7 @@ public class AccountController : Controller
 
         var client = _httpClientFactory.CreateClient("Api");
         var request = new UserRequest(model.Name, model.Age, model.Email, model.Password);
-        var response = await client.PostAsJsonAsync("/api/users/create", request);
+        var response = await client.PostAsJsonAsync("/api/auth/register", request);
         if (!response.IsSuccessStatusCode)
         {
             ModelState.AddModelError(string.Empty, "Could not create account.");

@@ -1,4 +1,5 @@
 using System.Text;
+using AmOzon.API.Extensions;
 using AmOzon.Application.Abstractions;
 using AmOzon.Application.Services;
 using AmOzon.Application.Settings;
@@ -119,6 +120,7 @@ try
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<AmOzonDbContext>();
     await context.Database.MigrateAsync();
+    await services.SeedRoles();
 }
 catch (Exception ex)
 {

@@ -21,7 +21,7 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
         builder
             .HasOne(u => u.UserCredentialsEntity)
             .WithOne(uc => uc.User)
-            .HasForeignKey<UserCredentialsEntity>(uc => uc.UserId)
+            .HasForeignKey<UserCredentialsEntity>(uc => uc.Id)
             .OnDelete(DeleteBehavior.Cascade);
         
         builder

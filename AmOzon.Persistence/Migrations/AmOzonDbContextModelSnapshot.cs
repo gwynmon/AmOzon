@@ -160,7 +160,6 @@ namespace AmOzon.Persistence.Migrations
             modelBuilder.Entity("AmOzon.Persistence.Entities.UserCredentialsEntity", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<int>("AccessFailedCount")
@@ -208,9 +207,6 @@ namespace AmOzon.Persistence.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -227,9 +223,6 @@ namespace AmOzon.Persistence.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.HasIndex("UserName")
                         .IsUnique();
@@ -253,7 +246,7 @@ namespace AmOzon.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("DomainUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -442,7 +435,7 @@ namespace AmOzon.Persistence.Migrations
                 {
                     b.HasOne("AmOzon.Persistence.Entities.UserEntity", "User")
                         .WithOne("UserCredentialsEntity")
-                        .HasForeignKey("AmOzon.Persistence.Entities.UserCredentialsEntity", "UserId")
+                        .HasForeignKey("AmOzon.Persistence.Entities.UserCredentialsEntity", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
