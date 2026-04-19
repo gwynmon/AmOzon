@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.Text;
 using AmOzon.Application.Abstractions;
 using AmOzon.Application.Services;
@@ -59,7 +58,6 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    // Отключаем редиректы для API — возвращаем 401 вместо 302
     options.Events.OnRedirectToLogin = context =>
     {
         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
